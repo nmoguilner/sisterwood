@@ -1,6 +1,11 @@
 <template>
     <div>
         <h1>Login</h1>
+
+        <p>
+            user: sisterwood@sisterwood.com<br/>
+            pass: sisterwood
+        </p>
         <form @submit.prevent="pressed">
             <input type="email" placeholder="email" v-model="email">
              <input type="text" placeholder="password" v-model="password">
