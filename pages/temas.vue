@@ -9,12 +9,13 @@
     </ul>
 
     <h1>Postea</h1>
+    <h2>Ingresar nombre y autor para submitear</h2>
 
     <form @submit.prevent="submit">
       <input type="text" placeholder="Tema" v-model="tema" />
       <input type="text" placeholder="Autor" v-model="autor" />
       <input type="number" placeholder="Voto" v-model="count" />
-      <button type="submit">Submit</button>
+      <button :disabled="!tema || !autor" type="submit">Submit</button>
     </form>
     <div class="error" v-if="error">{{ error.message }}</div>
   </div>
@@ -27,12 +28,9 @@ import { getUserFromCookie } from "@/helpers";
 
 export default {
   mounted() {
-    let db = firebase.database();
-    let temasRef = db.ref("temas");
-    temasRef.on("value", (snapshot) => {
-      console.log("temas", temas);
-      const temas = snapshot.val();
-      this.temas = temas;
+    const dbRef = firebase.database().ref();
+    dbRef.child("temas").on("value", (snapshot) => {
+      this.temas = snapshot.val();
     });
   },
   data() {
@@ -47,15 +45,17 @@ export default {
   methods: {
     submit() {
       let db = firebase.database();
-      let temasRef = db.ref("temas");
 
-      const newTema = {
+      const temaId = this.tema + "_" + this.autor;
+      let temaRef = db.ref("temas");
+
+      // Si no existe lo agrega, sino lo updatea
+      // TODO: case insensitive?
+      temaRef.child(temaId).set({
         nombre: this.tema,
         autor: this.autor,
         votos: this.count,
-      };
-
-      temasRef.push(newTema);
+      });
     },
   },
   asyncData({ req, redirect }) {
@@ -63,13 +63,13 @@ export default {
       const user = getUserFromCookie(req);
       if (!user) {
         redirect("/login");
-        alert('No estás logeado perro');
+        alert("No estás logeado perro");
       }
     } else {
       let user = firebase.auth().currentUser;
       if (!user) {
         redirect("/login");
-        alert('No estás logeado perro');
+        alert("No estás logeado perro");
       }
     }
   },
