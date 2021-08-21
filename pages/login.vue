@@ -33,7 +33,7 @@
                firebase.auth().signInWithEmailAndPassword(this.email, this.password)
                .then(data => {
                    console.log(data);
-                   this.$router.push('/secret');
+                   this.$router.push('/temas');
                })
                .catch(error => {
                    this.error = error;

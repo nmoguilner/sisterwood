@@ -2,7 +2,7 @@
 <template>
 <div class="container">
   <h1 class="title">
-    Sisterwood Firebase App
+    Hermano?
   </h1>
 </div>
 </template>
