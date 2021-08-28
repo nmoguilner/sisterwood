@@ -4,6 +4,7 @@
     <a href="javascript:void(0)" @click="logout" v-if="loggedIn">Logout</a>
     <nuxt-link to="login" v-else>Login</nuxt-link>
     <nuxt-link to="temas">Temas</nuxt-link>
+    <nuxt-link to="spotify">Spotify</nuxt-link>
     <Nuxt />
   </div>
 </template>

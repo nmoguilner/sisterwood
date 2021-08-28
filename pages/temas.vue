@@ -50,7 +50,7 @@ export default {
       let temaRef = db.ref("temas");
 
       // Si no existe lo agrega, sino lo updatea
-      // TODO: case insensitive?
+      // TODO: case insensitive?+
       temaRef.child(temaId).set({
         nombre: this.tema,
         autor: this.autor,
