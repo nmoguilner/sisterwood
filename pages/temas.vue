@@ -4,17 +4,19 @@
 
     <ul>
       <li v-for="(tema, i) in temas" v-bind:key="i">
-        {{ tema.nombre }} - {{ tema.autor }} - {{ tema.votos }}
+        Nombre: {{ tema.nombre }} - Autor: {{ tema.autor }} - Votos: {{ tema.votos }}
+        <button @click="vote(tema)">+1</button>
+
       </li>
     </ul>
 
-    <h1>Postea</h1>
+    <h1>Agregar temas</h1>
     <h2>Ingresar nombre y autor para submitear</h2>
 
     <form @submit.prevent="submit">
       <input type="text" placeholder="Tema" v-model="tema" />
       <input type="text" placeholder="Autor" v-model="autor" />
-      <input type="number" placeholder="Voto" v-model="count" />
+
       <button :disabled="!tema || !autor" type="submit">Submit</button>
     </form>
     <div class="error" v-if="error">{{ error.message }}</div>
@@ -28,8 +30,14 @@ import { getUserFromCookie } from "@/helpers";
 
 export default {
   mounted() {
-    const dbRef = firebase.database().ref();
-    dbRef.child("temas").on("value", (snapshot) => {
+     let db = firebase.database();
+      const dbRef = db.ref();
+
+      const customerId = 'customer1';
+      const customerRef = dbRef.child(customerId);
+
+      const customerTemasRef = customerRef.child('temas');
+    customerTemasRef.on("value", (snapshot) => {
       this.temas = snapshot.val();
     });
   },
@@ -37,26 +45,49 @@ export default {
     return {
       temas: [],
       tema: "",
-      count: 0,
       autor: "",
       error: "",
     };
   },
   methods: {
     submit() {
-      let db = firebase.database();
+     let db = firebase.database();
+      const dbRef = db.ref();
 
-      const temaId = this.tema + "_" + this.autor;
-      let temaRef = db.ref("temas");
+      const customerId = 'customer1';
+      const customerRef = dbRef.child(customerId);
+
+      const customerTemasRef = customerRef.child('temas');
+
+      const temaId = this.tema.toLowerCase().split(' ').join('_') + "_" + this.autor.toLowerCase().split(' ').join('_');
 
       // Si no existe lo agrega, sino lo updatea
       // TODO: case insensitive?+
-      temaRef.child(temaId).set({
+      customerTemasRef.child(temaId).set({
         nombre: this.tema,
         autor: this.autor,
-        votos: this.count,
+        votos: 0
       });
     },
+    vote(tema) {
+      let db = firebase.database();
+      const dbRef = db.ref();
+
+      const customerId = 'customer1';
+      const customerRef = dbRef.child(customerId);
+
+      const customerTemasRef = customerRef.child('temas');
+
+      const temaId = tema.nombre.toLowerCase().split(' ').join('_') + "_" + tema.autor.toLowerCase().split(' ').join('_');
+
+      // Si no existe lo agrega, sino lo updatea
+      // TODO: case insensitive?+
+      customerTemasRef.child(temaId).set({
+        nombre: tema.nombre,
+        autor: tema.autor,
+        votos: tema.votos ? ++tema.votos : 1,
+      });
+    }
   },
   asyncData({ req, redirect }) {
     if (process.server) {
